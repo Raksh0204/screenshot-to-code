@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Upload, Code, Loader2, Copy, Check } from 'lucide-react';
 
-export default function ScreenshotToCode() {
+// IMPORTANT: Replace this with your actual Groq API key
+const GROQ_API_KEY = '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';
+
+export default function App() {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [framework, setFramework] = useState('html');
@@ -32,26 +35,65 @@ export default function ScreenshotToCode() {
       return;
     }
 
+    if (GROQ_API_KEY === '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') {
+      setError('Please add your Groq API key in src/App.jsx');
+      return;
+    }
+
     setLoading(true);
     setError('');
     setGeneratedCode('');
 
+    const frameworkNames = {
+      html: 'HTML + CSS',
+      tailwind: 'HTML with Tailwind CSS',
+      react: 'React component with Tailwind CSS'
+    };
+
+    const prompt = `Analyze this UI screenshot and generate ${frameworkNames[framework]} code that recreates the UI.
+
+Requirements:
+- Clean and readable code
+- Semantic HTML structure
+- Responsive layout
+- Match colors, spacing, and typography as closely as possible
+- Include all visible elements and text
+${framework === 'react' ? '- Create a functional React component with proper hooks if needed' : ''}
+${framework === 'html' ? '- Include inline CSS or a <style> tag' : ''}
+${framework === 'tailwind' ? '- Use only Tailwind utility classes' : ''}
+
+Return ONLY the code without any explanation or markdown formatting.`;
+
     try {
-      const response = await fetch('/api/generate', {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${GROQ_API_KEY}`
         },
         body: JSON.stringify({
-          image: image,
-          framework: framework
+          model: 'llama-3.2-90b-vision-preview',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: `data:image/png;base64,${image}`
+                  }
+                },
+                {
+                  type: 'text',
+                  text: prompt
+                }
+              ]
+            }
+          ],
+          max_tokens: 4000,
+          temperature: 0.7
         })
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || `Error: ${response.status}`);
-      }
 
       const data = await response.json();
 
@@ -60,10 +102,7 @@ export default function ScreenshotToCode() {
         return;
       }
 
-      const code = data.content
-        .map(item => item.type === 'text' ? item.text : '')
-        .filter(Boolean)
-        .join('\n');
+      const code = data.choices?.[0]?.message?.content;
 
       if (!code) {
         setError('No code was generated');
@@ -73,7 +112,6 @@ export default function ScreenshotToCode() {
       setGeneratedCode(code);
     } catch (err) {
       setError(`Error: ${err.message}`);
-      console.error('Full error:', err);
     } finally {
       setLoading(false);
     }
@@ -95,7 +133,7 @@ export default function ScreenshotToCode() {
             <h1 className="text-4xl font-bold text-gray-900">Screenshot to Code</h1>
           </div>
           <p className="text-gray-600 text-lg">
-            Upload a UI screenshot and generate code instantly with AI
+            Upload a UI screenshot and generate code instantly with Groq AI
           </p>
         </div>
 
@@ -115,6 +153,7 @@ export default function ScreenshotToCode() {
                 className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
                 <option value="html">HTML + CSS</option>
+                <option value="tailwind">Tailwind CSS</option>
                 <option value="react">React</option>
               </select>
             </div>
@@ -209,7 +248,7 @@ export default function ScreenshotToCode() {
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-gray-600">
-          <p>Powered by Claude AI • Built with React and Tailwind CSS</p>
+          <p>Powered by Groq AI (Llama 3.2 Vision) • Built with React and Tailwind CSS</p>
         </div>
       </div>
     </div>
