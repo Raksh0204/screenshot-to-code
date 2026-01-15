@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Upload, Code, Loader2, Copy, Check } from 'lucide-react';
 
 // IMPORTANT: Replace this with your actual Groq API key
-const GROQ_API_KEY = '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';
+const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
 export default function App() {
   const [image, setImage] = useState(null);
@@ -35,10 +35,10 @@ export default function App() {
       return;
     }
 
-    if (GROQ_API_KEY === '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') {
-      setError('Please add your Groq API key in src/App.jsx');
-      return;
-    }
+   if (!GROQ_API_KEY) {
+  setError('Groq API key is missing. Please check environment variables.');
+  return;
+}
 
     setLoading(true);
     setError('');
