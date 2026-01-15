@@ -36,66 +36,21 @@ export default function ScreenshotToCode() {
     setError('');
     setGeneratedCode('');
 
-    const frameworkNames = {
-      html: 'HTML + CSS',
-      react: 'React component'
-    };
-
-    const prompt = `Analyze this UI screenshot and generate ${frameworkNames[framework]} code that recreates the UI.
-
-Requirements:
-- Clean and readable code
-- Semantic HTML structure
-- Responsive layout
-- Match colors, spacing, and typography as closely as possible
-- Include all visible elements and text
-${framework === 'react' ? '- Create a functional React component with proper hooks if needed\n- Use inline styles or CSS modules for styling' : ''}
-${framework === 'html' ? '- Include inline CSS or a <style> tag' : ''}
-
-Return ONLY the code without any explanation or markdown formatting.`;
-
     try {
-      const apiKey = import.meta.env.VITE_VERCEL_SS;
-      
-      if (!apiKey) {
-        throw new Error('API key not found. Please add VITE_VERCEL_SS to your environment variables.');
-      }
-
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4000,
-          messages: [
-            {
-              role: 'user',
-              content: [
-                {
-                  type: 'image',
-                  source: {
-                    type: 'base64',
-                    media_type: 'image/jpeg',
-                    data: image
-                  }
-                },
-                {
-                  type: 'text',
-                  text: prompt
-                }
-              ]
-            }
-          ]
+          image: image,
+          framework: framework
         })
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || `API error: ${response.status} ${response.statusText}`);
+        throw new Error(errorData.error?.message || `Error: ${response.status}`);
       }
 
       const data = await response.json();
