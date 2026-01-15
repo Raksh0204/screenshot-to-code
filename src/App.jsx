@@ -55,10 +55,10 @@ ${framework === 'html' ? '- Include inline CSS or a <style> tag' : ''}
 Return ONLY the code without any explanation or markdown formatting.`;
 
     try {
-      const apiKey = import.meta.env.VERCEL_SS;
+      const apiKey = import.meta.env.VITE_VERCEL_SS;
       
       if (!apiKey) {
-        throw new Error('API key not found. Please add VERCEL_SS to your environment variables.');
+        throw new Error('API key not found. Please add VITE_VERCEL_SS to your environment variables.');
       }
 
       const response = await fetch('https://api.anthropic.com/v1/messages', {
