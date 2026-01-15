@@ -55,13 +55,19 @@ ${framework === 'html' ? '- Include inline CSS or a <style> tag' : ''}
 Return ONLY the code without any explanation or markdown formatting.`;
 
     try {
+      const apiKey = import.meta.env.VERCEL_SS;
+      
+      if (!apiKey) {
+        throw new Error('API key not found. Please add VERCEL_SS to your environment variables.');
+      }
+
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
-  'Content-Type': 'application/json',
-  'x-api-key': import.meta.env.VERCEL_SS,
-  'anthropic-version': '2023-06-01',
-},
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+        },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 4000,
@@ -73,7 +79,7 @@ Return ONLY the code without any explanation or markdown formatting.`;
                   type: 'image',
                   source: {
                     type: 'base64',
-                    media_type: 'image/png',
+                    media_type: 'image/jpeg',
                     data: image
                   }
                 },
@@ -86,6 +92,11 @@ Return ONLY the code without any explanation or markdown formatting.`;
           ]
         })
       });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `API error: ${response.status} ${response.statusText}`);
+      }
 
       const data = await response.json();
 
@@ -107,6 +118,7 @@ Return ONLY the code without any explanation or markdown formatting.`;
       setGeneratedCode(code);
     } catch (err) {
       setError(`Error: ${err.message}`);
+      console.error('Full error:', err);
     } finally {
       setLoading(false);
     }
@@ -242,7 +254,7 @@ Return ONLY the code without any explanation or markdown formatting.`;
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-gray-600">
-          <p> • Built with React and Tailwind CSS • </p>
+          <p>Powered by Claude AI • Built with React and Tailwind CSS</p>
         </div>
       </div>
     </div>
