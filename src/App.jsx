@@ -58,8 +58,10 @@ Return ONLY the code without any explanation or markdown formatting.`;
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-        },
+  'Content-Type': 'application/json',
+  'x-api-key': import.meta.env.VERCEL_SS,
+  'anthropic-version': '2023-06-01',
+},
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 4000,
