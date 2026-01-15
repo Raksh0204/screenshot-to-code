@@ -72,7 +72,7 @@ Return ONLY the code without any explanation or markdown formatting.`;
           'Authorization': `Bearer ${GROQ_API_KEY}`
         },
         body: JSON.stringify({
-          model: 'llama-3.2-11b-vision-preview',
+          model: 'llama-3.1-8b-instant',
           messages: [
             {
               role: 'user',
