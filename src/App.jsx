@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, Code, Loader2, Copy, Check } from 'lucide-react';
 
-export default function App() {
+export default function ScreenshotToCode() {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [framework, setFramework] = useState('html');
@@ -36,183 +36,34 @@ export default function App() {
     setError('');
     setGeneratedCode('');
 
-    const frameworkNames = {
-      html: 'HTML + CSS',
-      tailwind: 'HTML with Tailwind CSS',
-      react: 'React component with Tailwind CSS'
-    };
-
-    const prompt = `Generate ${frameworkNames[framework]} code for this UI screenshot.
-
-Requirements:
-- Clean and readable code
-- Semantic HTML structure
-- Responsive layout
-- Match colors, spacing, and typography
-- Include all visible elements
-${framework === 'react' ? '- Functional React component' : ''}
-${framework === 'html' ? '- Include CSS in <style> tag' : ''}
-${framework === 'tailwind' ? '- Use Tailwind utility classes' : ''}
-
-Return ONLY the code, no explanations.`;
-
     try {
-      // Using Hugging Face's free image-to-text model
-      const response = await fetch(
-        'https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            inputs: image,
-          }),
-        }
-      );
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image: image,
+          framework: framework
+        })
+      });
+
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error('Failed to analyze image');
+        throw new Error(data.error || `Error: ${response.status}`);
       }
 
-      const result = await response.json();
-      const description = result[0]?.generated_text || 'UI interface';
+      if (!data.code) {
+        throw new Error('No code was generated');
+      }
 
-      // Generate code based on description and framework
-      const code = generateCodeFromDescription(description, framework);
-      setGeneratedCode(code);
-
+      setGeneratedCode(data.code);
     } catch (err) {
-      console.error('Error:', err);
       setError(`Error: ${err.message}`);
+      console.error('Full error:', err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const generateCodeFromDescription = (description, framework) => {
-    // This is a simple template-based code generator
-    // You can enhance this with more sophisticated logic
-
-    if (framework === 'html') {
-      return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${description}</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 500px;
-            width: 100%;
-        }
-        
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 28px;
-        }
-        
-        p {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-        
-        button {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        button:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Welcome</h1>
-        <p>This is a template based on: ${description}</p>
-        <button onclick="alert('Button clicked!')">Click Me</button>
-    </div>
-</body>
-</html>`;
-    } else if (framework === 'tailwind') {
-      return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${description}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen flex items-center justify-center p-6">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
-        <h1 class="text-3xl font-bold text-gray-800 mb-4">Welcome</h1>
-        <p class="text-gray-600 mb-6 leading-relaxed">
-            This is a template based on: ${description}
-        </p>
-        <button class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition transform hover:scale-105">
-            Click Me
-        </button>
-    </div>
-</body>
-</html>`;
-    } else {
-      return `import React from 'react';
-
-export default function Component() {
-  const handleClick = () => {
-    alert('Button clicked!');
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Welcome
-        </h1>
-        <p className="text-gray-600 mb-6 leading-relaxed">
-          This is a template based on: ${description}
-        </p>
-        <button 
-          onClick={handleClick}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition transform hover:scale-105"
-        >
-          Click Me
-        </button>
-      </div>
-    </div>
-  );
-}`;
     }
   };
 
@@ -232,7 +83,7 @@ export default function Component() {
             <h1 className="text-4xl font-bold text-gray-900">Screenshot to Code</h1>
           </div>
           <p className="text-gray-600 text-lg">
-            Upload a UI screenshot and generate code instantly - 100% Free!
+            Upload a UI screenshot and generate code instantly with AI
           </p>
         </div>
 
@@ -252,7 +103,6 @@ export default function Component() {
                 className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
                 <option value="html">HTML + CSS</option>
-                <option value="tailwind">Tailwind CSS</option>
                 <option value="react">React</option>
               </select>
             </div>
@@ -305,11 +155,6 @@ export default function Component() {
                 {error}
               </div>
             )}
-
-            {/* Info Message */}
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 text-xs">
-              ℹ️ This uses a free AI model. Results are template-based and may not perfectly match your screenshot.
-            </div>
           </div>
 
           {/* Right Panel - Output */}
@@ -352,7 +197,7 @@ export default function Component() {
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-gray-600">
-          <p>Powered by Hugging Face (Free) • Built with React and Tailwind CSS</p>
+          <p>Powered by Google Gemini AI • Built with React and Tailwind CSS</p>
         </div>
       </div>
     </div>
