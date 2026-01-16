@@ -35,45 +35,54 @@ ${framework === 'html' ? '- Include inline CSS or a <style> tag' : ''}
 
 Return ONLY the code without any explanation or markdown formatting.`;
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.VERCEL_SS,
-        'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4000,
-        messages: [
+        contents: [
           {
-            role: 'user',
-            content: [
+            parts: [
               {
-                type: 'image',
-                source: {
-                  type: 'base64',
-                  media_type: 'image/jpeg',
-                  data: image
-                }
+                text: prompt
               },
               {
-                type: 'text',
-                text: prompt
+                inline_data: {
+                  mime_type: "image/jpeg",
+                  data: image
+                }
               }
             ]
           }
-        ]
+        ],
+        generationConfig: {
+          temperature: 0.4,
+          maxOutputTokens: 8192,
+        }
       })
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      return res.status(response.status).json(data);
+      console.error('Gemini API error:', data);
+      return res.status(response.status).json({ 
+        error: data.error?.message || 'Failed to generate code' 
+      });
     }
 
-    return res.status(200).json(data);
+    // Extract text from Gemini response
+    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    if (!generatedText) {
+      return res.status(500).json({ error: 'No code generated' });
+    }
+
+    return res.status(200).json({ 
+      code: generatedText 
+    });
+
   } catch (error) {
     console.error('Error:', error);
     return res.status(500).json({ error: error.message });
