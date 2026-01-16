@@ -77,7 +77,7 @@ Return ONLY the code without any explanation or markdown formatting.`;
           temperature: 0.4,
           topK: 32,
           topP: 1,
-          maxOutputTokens: 8000
+          maxOutputTokens: 1000
         }
       };
 
