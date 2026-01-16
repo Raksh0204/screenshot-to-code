@@ -1,4 +1,4 @@
-🖼️ Screenshot to Code
+## 🖼️ Screenshot to Code
 
 Screenshot to Code is an AI-powered web tool that converts UI screenshots into clean, production-ready frontend code.
 Upload any design screenshot and instantly get structured HTML, Tailwind CSS, or React components — no manual recreation needed.
@@ -60,8 +60,6 @@ Copy to clipboard with one click
 📋 One-click copy — Copy to clipboard instantly
 🎯 Pixel-perfect output — Matches designs with maximum accuracy
 
-
-
 🛠️ Tech Stack
 ┌─────────────────────────────────────────────┐
 │ Frontend                                    │
@@ -99,7 +97,7 @@ Installation
 
 Clone the repository
 
-bash   git clone https://github.com/yourusername/screenshot-to-code.git
+bash   git clone https://github.com/Raksh0204/screenshot-to-code.git
    cd screenshot-to-code
 
 Install dependencies
@@ -134,7 +132,6 @@ Copy the generated code and paste it into your project
 🎨 Supported Output Formats
 
 FrameworkDescriptionHTML + CSSVanilla HTML with inline or embedded CSSTailwind CSSHTML with Tailwind utility classesReactFunctional React component with Tailwind CSS
-
 
 🚀 Future Enhancements
 
