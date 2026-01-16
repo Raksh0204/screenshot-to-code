@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Upload, Code, Loader2, Copy, Check } from 'lucide-react';
 
 // Get API key from environment variable
-const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
+const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 export default function App() {
   const [image, setImage] = useState(null);
@@ -35,7 +35,7 @@ export default function App() {
       return;
     }
 
-    if (!GROQ_API_KEY) {
+    if (!OPENAI_API_KEY) {
       setError('API key is missing. Check Vercel environment variables.');
       return;
     }
@@ -65,14 +65,14 @@ ${framework === 'tailwind' ? '- Use only Tailwind utility classes' : ''}
 Return ONLY the code without any explanation or markdown formatting.`;
 
     try {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${GROQ_API_KEY}`
+          'Authorization': `Bearer ${OPENAI_API_KEY}`
         },
         body: JSON.stringify({
-          model: 'llama-3.2-11b-vision-preview',
+          model: 'gpt-4o',
           messages: [
             {
               role: 'user',
@@ -90,8 +90,7 @@ Return ONLY the code without any explanation or markdown formatting.`;
               ]
             }
           ],
-          max_tokens: 4000,
-          temperature: 0.7
+          max_tokens: 4000
         })
       });
 
@@ -109,7 +108,9 @@ Return ONLY the code without any explanation or markdown formatting.`;
         return;
       }
 
-      setGeneratedCode(code);
+      // Remove markdown code blocks if present
+      const cleanCode = code.replace(/```[\w]*\n?/g, '').trim();
+      setGeneratedCode(cleanCode);
     } catch (err) {
       console.error('Error:', err);
       setError(`Error: ${err.message}`);
@@ -134,7 +135,7 @@ Return ONLY the code without any explanation or markdown formatting.`;
             <h1 className="text-4xl font-bold text-gray-900">Screenshot to Code</h1>
           </div>
           <p className="text-gray-600 text-lg">
-            Upload a UI screenshot and generate code instantly with Groq AI
+            Upload a UI screenshot and generate code instantly with AI
           </p>
         </div>
 
@@ -249,7 +250,7 @@ Return ONLY the code without any explanation or markdown formatting.`;
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-gray-600">
-          <p>Powered by Groq AI (Llama 3.2 Vision) • Built with React and Tailwind CSS</p>
+          <p>Powered by OpenAI GPT-4o • Built with React and Tailwind CSS</p>
         </div>
       </div>
     </div>
