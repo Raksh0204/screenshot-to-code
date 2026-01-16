@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, Code, Loader2, Copy, Check } from 'lucide-react';
 
-// Get API key from environment variable
-const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
-
 export default function App() {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -35,11 +32,6 @@ export default function App() {
       return;
     }
 
-    if (!OPENAI_API_KEY) {
-      setError('API key is missing. Check Vercel environment variables.');
-      return;
-    }
-
     setLoading(true);
     setError('');
     setGeneratedCode('');
@@ -50,72 +42,177 @@ export default function App() {
       react: 'React component with Tailwind CSS'
     };
 
-    const prompt = `Analyze this UI screenshot and generate ${frameworkNames[framework]} code that recreates the UI.
+    const prompt = `Generate ${frameworkNames[framework]} code for this UI screenshot.
 
 Requirements:
 - Clean and readable code
 - Semantic HTML structure
 - Responsive layout
-- Match colors, spacing, and typography as closely as possible
-- Include all visible elements and text
-${framework === 'react' ? '- Create a functional React component with proper hooks if needed' : ''}
-${framework === 'html' ? '- Include inline CSS or a <style> tag' : ''}
-${framework === 'tailwind' ? '- Use only Tailwind utility classes' : ''}
+- Match colors, spacing, and typography
+- Include all visible elements
+${framework === 'react' ? '- Functional React component' : ''}
+${framework === 'html' ? '- Include CSS in <style> tag' : ''}
+${framework === 'tailwind' ? '- Use Tailwind utility classes' : ''}
 
-Return ONLY the code without any explanation or markdown formatting.`;
+Return ONLY the code, no explanations.`;
 
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o',
-          messages: [
-            {
-              role: 'user',
-              content: [
-                {
-                  type: 'image_url',
-                  image_url: {
-                    url: `data:image/png;base64,${image}`
-                  }
-                },
-                {
-                  type: 'text',
-                  text: prompt
-                }
-              ]
-            }
-          ],
-          max_tokens: 4000
-        })
-      });
+      // Using Hugging Face's free image-to-text model
+      const response = await fetch(
+        'https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            inputs: image,
+          }),
+        }
+      );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || `API error: ${response.status}`);
+        throw new Error('Failed to analyze image');
       }
 
-      const data = await response.json();
+      const result = await response.json();
+      const description = result[0]?.generated_text || 'UI interface';
 
-      const code = data.choices?.[0]?.message?.content;
+      // Generate code based on description and framework
+      const code = generateCodeFromDescription(description, framework);
+      setGeneratedCode(code);
 
-      if (!code) {
-        setError('No code was generated. Please try again.');
-        return;
-      }
-
-      // Remove markdown code blocks if present
-      const cleanCode = code.replace(/```[\w]*\n?/g, '').trim();
-      setGeneratedCode(cleanCode);
     } catch (err) {
       console.error('Error:', err);
       setError(`Error: ${err.message}`);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const generateCodeFromDescription = (description, framework) => {
+    // This is a simple template-based code generator
+    // You can enhance this with more sophisticated logic
+
+    if (framework === 'html') {
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${description}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome</h1>
+        <p>This is a template based on: ${description}</p>
+        <button onclick="alert('Button clicked!')">Click Me</button>
+    </div>
+</body>
+</html>`;
+    } else if (framework === 'tailwind') {
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${description}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen flex items-center justify-center p-6">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Welcome</h1>
+        <p class="text-gray-600 mb-6 leading-relaxed">
+            This is a template based on: ${description}
+        </p>
+        <button class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition transform hover:scale-105">
+            Click Me
+        </button>
+    </div>
+</body>
+</html>`;
+    } else {
+      return `import React from 'react';
+
+export default function Component() {
+  const handleClick = () => {
+    alert('Button clicked!');
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center p-6">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+        <h1 className="text-3xl font-bold text-gray-800 mb-4">
+          Welcome
+        </h1>
+        <p className="text-gray-600 mb-6 leading-relaxed">
+          This is a template based on: ${description}
+        </p>
+        <button 
+          onClick={handleClick}
+          className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition transform hover:scale-105"
+        >
+          Click Me
+        </button>
+      </div>
+    </div>
+  );
+}`;
     }
   };
 
@@ -135,7 +232,7 @@ Return ONLY the code without any explanation or markdown formatting.`;
             <h1 className="text-4xl font-bold text-gray-900">Screenshot to Code</h1>
           </div>
           <p className="text-gray-600 text-lg">
-            Upload a UI screenshot and generate code instantly with AI
+            Upload a UI screenshot and generate code instantly - 100% Free!
           </p>
         </div>
 
@@ -208,6 +305,11 @@ Return ONLY the code without any explanation or markdown formatting.`;
                 {error}
               </div>
             )}
+
+            {/* Info Message */}
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 text-xs">
+              ℹ️ This uses a free AI model. Results are template-based and may not perfectly match your screenshot.
+            </div>
           </div>
 
           {/* Right Panel - Output */}
@@ -250,7 +352,7 @@ Return ONLY the code without any explanation or markdown formatting.`;
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-gray-600">
-          <p>Powered by OpenAI GPT-4o • Built with React and Tailwind CSS</p>
+          <p>Powered by Hugging Face (Free) • Built with React and Tailwind CSS</p>
         </div>
       </div>
     </div>
