@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, Code, Loader2, Copy, Check } from 'lucide-react';
 
-// IMPORTANT: Replace this with your actual Groq API key
+// Get API key from environment variable
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
 export default function App() {
@@ -35,10 +35,10 @@ export default function App() {
       return;
     }
 
-   if (!GROQ_API_KEY) {
-  setError('Groq API key is missing. Please check environment variables.');
-  return;
-}
+    if (!GROQ_API_KEY) {
+      setError('API key is missing. Check Vercel environment variables.');
+      return;
+    }
 
     setLoading(true);
     setError('');
@@ -72,7 +72,7 @@ Return ONLY the code without any explanation or markdown formatting.`;
           'Authorization': `Bearer ${GROQ_API_KEY}`
         },
         body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
+          model: 'llama-3.2-11b-vision-preview',
           messages: [
             {
               role: 'user',
@@ -95,22 +95,23 @@ Return ONLY the code without any explanation or markdown formatting.`;
         })
       });
 
-      const data = await response.json();
-
-      if (data.error) {
-        setError(data.error.message || 'Failed to generate code');
-        return;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || `API error: ${response.status}`);
       }
+
+      const data = await response.json();
 
       const code = data.choices?.[0]?.message?.content;
 
       if (!code) {
-        setError('No code was generated');
+        setError('No code was generated. Please try again.');
         return;
       }
 
       setGeneratedCode(code);
     } catch (err) {
+      console.error('Error:', err);
       setError(`Error: ${err.message}`);
     } finally {
       setLoading(false);
