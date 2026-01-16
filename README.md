@@ -4,7 +4,7 @@ Screenshot to Code is an AI-powered web tool that converts UI screenshots into c
 Upload any design screenshot and instantly get structured HTML, Tailwind CSS, or React components — no manual recreation needed.
 Built to save developers time, eliminate repetitive UI work, and accelerate prototyping.
 
-🎯 What is Screenshot to Code?
+# 🎯 What is Screenshot to Code?
 
 Screenshot to Code bridges the gap between design and development.
 Instead of manually rebuilding UIs from screenshots or design mockups, developers can simply:
@@ -13,7 +13,7 @@ Instead of manually rebuilding UIs from screenshots or design mockups, developer
 🧩 Get pixel-perfect frontend code instantly
 The generated code can be used as a starting point for websites, dashboards, and web apps — with exact colors, spacing, and typography.
 
-🌟 Why This Exists
+# 🌟 Why This Exists
 
 Every developer has faced this pain:
 
@@ -28,7 +28,7 @@ Screenshot to Code fixes this.
 ✔ Rapid prototyping
 ✔ Cleaner starting code
 
-⚡ How It Works
+#⚡ How It Works
 
 🔄 Processing Flow
 ┌────────────────────────────┐
@@ -43,7 +43,7 @@ Screenshot to Code fixes this.
 │ Live Preview / Copy Code   │
 └────────────────────────────┘
 
-👨‍💻 User Experience
+# 👨‍💻 User Experience
 
 Select your preferred framework (HTML, Tailwind, or React)
 Upload a UI screenshot (PNG/JPG)
@@ -51,7 +51,7 @@ Click "Generate Code"
 View generated code instantly
 Copy to clipboard with one click
 
-🛠️ Key Features
+# 🛠️ Key Features
 
 📸 Screenshot upload support — PNG, JPG, and more
 🧠 AI-powered precision — Exact colors, spacing, and typography
@@ -60,7 +60,7 @@ Copy to clipboard with one click
 📋 One-click copy — Copy to clipboard instantly
 🎯 Pixel-perfect output — Matches designs with maximum accuracy
 
-🛠️ Tech Stack
+# 🛠️ Tech Stack
 ┌─────────────────────────────────────────────┐
 │ Frontend                                    │
 │ React (Hooks-based architecture)            │
@@ -85,8 +85,7 @@ Google Gemini AI: Advanced vision capabilities + accurate code generation
 Lucide React: Beautiful, lightweight icon library
 Multiple output formats: Flexibility for different project needs
 
-
-🚀 Getting Started
+#🚀 Getting Started
 
 Prerequisites
 Node.js (v14+)
@@ -118,7 +117,7 @@ Open your browser
 
 Navigate to http://localhost:3000
 
-📝 Usage
+#📝 Usage
 
 Select Framework
 Choose between HTML+CSS, Tailwind CSS, or React components
@@ -129,11 +128,11 @@ Click "Generate Code" and wait for AI processing (usually 3-5 seconds)
 Copy & Use
 Copy the generated code and paste it into your project
 
-🎨 Supported Output Formats
+#🎨 Supported Output Formats
 
 FrameworkDescriptionHTML + CSSVanilla HTML with inline or embedded CSSTailwind CSSHTML with Tailwind utility classesReactFunctional React component with Tailwind CSS
 
-🚀 Future Enhancements
+#🚀 Future Enhancements
 
  Live preview within the app
  Support for Vue.js and Svelte
@@ -143,7 +142,7 @@ FrameworkDescriptionHTML + CSSVanilla HTML with inline or embedded CSSTailwind C
  Figma plugin support
  Dark mode UI
 
-📈 Use Cases
+#📈 Use Cases
 
 Rapid prototyping — Turn mockups into code in seconds
 Learning tool — Understand how designs translate to code
@@ -151,7 +150,7 @@ Hackathons — Speed up UI development during time-crunched events
 Design handoff — Bridge the gap between designers and developers
 Legacy redesigns — Recreate UIs from screenshots
 
-🤝 Contributing
+#🤝 Contributing
 
 Contributions are welcome! Feel free to:
 
@@ -160,5 +159,5 @@ Suggest new features
 Submit pull requests
 Improve documentation
 
-👨‍💻 Author
+#👨‍💻 Author
 Rakshitha U | ECE STUDENT
