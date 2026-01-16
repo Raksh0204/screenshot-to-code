@@ -1,3 +1,5 @@
+
+
 # 🖼️ Screenshot to Code  
 
 **Screenshot to Code** is an AI-powered web tool that converts UI screenshots into clean, production-ready frontend code.  
@@ -5,8 +7,7 @@ Upload any design screenshot and instantly get structured **HTML, Tailwind CSS, 
 
 Built to save developers time, eliminate repetitive UI work, and accelerate prototyping.
 
-> ⚙️ Built with **React + Google Gemini AI**
-
+<img width="1919" height="873" alt="image" src="https://github.com/user-attachments/assets/9917031b-1493-4dcb-b1ca-0065d848dbee" />
 ---
 
 ## 🎯 What is Screenshot to Code?
@@ -57,6 +58,7 @@ Every developer has faced this pain:
 │ Live Preview / Copy Code   │
 └────────────────────────────┘
 ```
+
 
 ### 👨‍💻 User Experience
 1. Select your preferred framework (HTML, Tailwind, or React)
